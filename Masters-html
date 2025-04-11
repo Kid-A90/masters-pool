@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masters Pool Leaderboard</title>
+    <style>
+        :root {
+            --primary-color: #025927;
+            --secondary-color: #f9f6e7;
+            --accent-color: #f8df65;
+            --text-color: #333;
+            --light-text: #666;
+            --border-color: #ddd;
+            --success-color: #2e8b57;
+            --error-color: #d62828;
+            --card-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            --header-font: Georgia, serif;
+            --body-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--body-font);
+            background-color: #f5f5f5;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1.5rem 0;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        header h1 {
+            font-family: var(--header-font);
+            font-size: 2rem;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            font-style: italic;
+            color: var(--accent-color);
+            margin-top: 0.25rem;
+            font-size: 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--card-shadow);
+        }
+
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-family: var(--header-font);
+            font-weight: 600;
+        }
+
+        .file-input-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .file-input-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .file-input-instructions {
+            font-size: 0.9rem;
+            color: var(--light-text);
+            margin-bottom: 1rem;
+        }
+
+        .file-input {
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            width: 100%;
+        }
+
+        .button-wrapper {
+            display: flex;
+            gap: 1rem;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #037d36;
+        }
+
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        button.secondary {
+            background-color: #f0f0f0;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        button.secondary:hover {
+            background-color: #e0e0e0;
+        }
+
+        .sample-data-btn {
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+        }
+
+        .status {
+            text-align: center;
+            margin: 1rem 0;
+            padding: 0.75rem;
+            border-radius: 4px;
+            font-style: italic;
+            background-color: var(--secondary-color);
+            color: var(--light-text);
+        }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .refresh-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .refresh-timer {
+            color: var(--light-text);
+            font-size: 0.9rem;
+        }
+
+        .sort-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-weight: 500;
+        }
+
+        select {
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: white;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            gap: 0.25rem;
+        }
+
+        .tab {
+            padding: 0.75rem 1.25rem;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            border-radius: 6px 6px 0 0;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            background-color: #f5f5f5;
+        }
+
+        .tab.active {
+            background-color: white;
+            border-color: var(--border-color);
+            border-bottom-color: white;
+            margin-bottom: -1px;
+            color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: #f8f8f8;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+
+        tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        tr.top-three {
+            font-weight: 600;
+        }
+
+        tr.first {
+            background-color: rgba(248, 223, 101, 0.2) !important;  /* Lighter gold */
+        }
+
+        tr.second {
+            background-color: rgba(192, 192, 192, 0.2) !important;  /* Lighter silver */
+        }
+
+        tr.third {
+            background-color: rgba(205, 127, 50, 0.2) !important;  /* Lighter bronze */
+        }
+
+        .player-summary {
+            font-size: 0.85rem;
+            color: var(--light-text);
+            margin-bottom: 0.25rem;
+        }
+
+        .score {
+            font-weight: bold;
+        }
+
+        .positive {
+            color: var(--error-color);
+        }
+
+        .negative {
+            color: var(--success-color);
+        }
+
+        .even {
+            color: var(--text-color);
+        }
+
+        .player-details {
+            margin-top: 1rem;
+            background-color: white;
+            padding: 1rem;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .loading {
+            text-align: center;
+            margin: 2rem;
+            font-size: 1.2rem;
+            color: var(--light-text);
+        }
+
+        .error {
+            color: var(--error-color);
+            text-align: center;
+            margin: 1rem 0;
+            padding: 0.75rem;
+            border-radius: 4px;
+            background-color: #ffeeee;
+        }
+
+        .success {
+            color: var(--success-color);
+            text-align: center;
+            margin: 1rem 0;
+            padding: 0.75rem;
+            border-radius: 4px;
+            background-color: #eeffee;
+        }
+        
+        .info-section {
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            color: var(--light-text);
+            line-height: 1.5;
+        }
+        
+        .team-score-summary {
+            font-weight: 600;
+            display: inline-block;
+            min-width: 60px;
+            text-align: right;
+            padding: 0 0.5rem;
+        }
+        
+        .thru-cell {
+            text-align: center;
+        }
+        
+        .bold {
+            font-weight: 600;
+        }
+        
+        .last-update {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            color: var(--light-text);
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .tab {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.9rem;
+            }
+            
+            th, td {
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
+            
+            header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .card {
+                padding: 1rem;
+            }
+        }
+        
+        /* Mobile specific styles */
+        @media (max-width: 480px) {
+            .responsive-table {
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            
+            .button-wrapper {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Masters Pool Leaderboard</h1>
+        <div class="subtitle">Live Tournament Tracking</div>
+    </header>
+    
+    <div class="container">
+        <div class="card" id="file-upload-card">
+            <h2>Upload Your Pool Data</h2>
+            <div class="file-input-container">
+                <div class="file-input-instructions">
+                    <p>Upload your Masters Pool Excel file to get started. Your file should contain:</p>
+                    <ul>
+                        <li>Team/participant names in the first column</li>
+                        <li>Golfer names in subsequent columns</li>
+                    </ul>
+                </div>
+                
+                <div class="file-input-wrapper">
+                    <input type="file" id="excelFile" accept=".xlsx, .xls" class="file-input" />
+                </div>
+                
+                <div class="button-wrapper">
+                    <button id="loadFileBtn">Load Pool Data</button>
+                    <button id="loadSampleBtn" class="secondary sample-data-btn">Use Sample Data</button>
+                </div>
+            </div>
+        </div>
+        
+        <div id="leaderboard-container" style="display: none;">
+            <div class="card">
+                <div id="status" class="status">Loading data...</div>
+                
+                <div class="controls">
+                    <div class="refresh-controls">
+                        <button id="refreshBtn">Refresh Scores</button>
+                        <span class="refresh-timer" id="refreshTimer"></span>
+                    </div>
+                    
+                    <div class="sort-controls">
+                        <label for="sortBy">Sort by: </label>
+                        <select id="sortBy">
+                            <option value="totalScore">Total Score</option>
+                            <option value="name">Team Name</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" data-tab="leaderboard">Pool Leaderboard</div>
+                    <div class="tab" data-tab="playerScores">Golfer Scores</div>
+                </div>
+                
+                <div class="tab-content active" id="leaderboard">
+                    <div class="responsive-table">
+                        <table id="leaderboardTable">
+                            <thead>
+                                <tr>
+                                    <th>Rank</th>
+                                    <th>Team Name</th>
+                                    <th>Golfers</th>
+                                    <th>Score</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboardBody">
+                                <!-- Leaderboard rows will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="playerScores">
+                    <div class="responsive-table">
+                        <table id="playerScoresTable">
+                            <thead>
+                                <tr>
+                                    <th>Player</th>
+                                    <th>Score</th>
+                                    <th>Position</th>
+                                    <th>Today</th>
+                                    <th>Thru</th>
+                                </tr>
+                            </thead>
+                            <tbody id="playerScoresBody">
+                                <!-- Player scores will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="last-update" id="lastUpdate"></div>
+            </div>
+            
+            <div class="card info-section">
+                <h2>How It Works</h2>
+                <p>This app simulates live Masters Tournament data and calculates your pool standings. During the actual tournament, the real data would come from official sources.</p>
+                <p>To update scores during the tournament, press the "Refresh Scores" button or wait for the automatic refresh every 5 minutes.</p>
+                <p>Your pool data is stored locally in your browser. To share this with friends, you'll need to have them access the same URL and upload the same Excel file.</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        // Global state
+        const state = {
+            poolData: null,
+            golfersData: [],
+            lastRefresh: null,
+            refreshInterval: null,
+            autoRefreshMinutes: 5,
+            countdownSeconds: 0
+        };
+
+        // DOM Elements
+        const elements = {
+            fileInput: document.getElementById('excelFile'),
+            loadFileBtn: document.getElementById('loadFileBtn'),
+            loadSampleBtn: document.getElementById('loadSampleBtn'),
+            fileUploadCard: document.getElementById('file-upload-card'),
+            leaderboardContainer: document.getElementById('leaderboard-container'),
+            refreshBtn: document.getElementById('refreshBtn'),
+            refreshTimer: document.getElementById('refreshTimer'),
+            sortBy: document.getElementById('sortBy'),
+            leaderboardBody: document.getElementById('leaderboardBody'),
+            playerScoresBody: document.getElementById('playerScoresBody'),
+            status: document.getElementById('status'),
+            lastUpdate: document.getElementById('lastUpdate'),
+            tabs: document.querySelectorAll('.tab'),
+            tabContents: document.querySelectorAll('.tab-content')
+        };
+
+        // Initialize the application
+        function init() {
+            // Event listeners
+            elements.loadFileBtn.addEventListener('click', handleFileLoad);
+            elements.loadSampleBtn.addEventListener('click', loadSampleData);
+            elements.refreshBtn.addEventListener('click', refreshScores);
+            elements.sortBy.addEventListener('change', renderLeaderboard);
+            
+            // Tab navigation
+            elements.tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    switchTab(tabId);
+                });
+        }
+
+        // Helper function to format golf scores
+        function formatScore(score) {
+            if (score === null || score === undefined) return '-';
+            if (score === 0) return 'E';
+            return score > 0 ? `+${score}` : score.toString();
+        }
+
+        // Switch between tabs
+        function switchTab(tabId) {
+            // Update tab buttons
+            elements.tabs.forEach(tab => {
+                tab.classList.toggle('active', tab.getAttribute('data-tab') === tabId);
+            });
+            
+            // Update tab content visibility
+            elements.tabContents.forEach(content => {
+                content.classList.toggle('active', content.id === tabId);
+            });
+        }
+
+        // Initialize the application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+        }
+
+        // Render the player scores table
+        function renderPlayerScores() {
+            if (!state.golfersData || !state.golfersData.length) return;
+            
+            // Sort golfers by score
+            const sortedGolfers = [...state.golfersData].sort((a, b) => a.score - b.score);
+            
+            // Clear the table body
+            elements.playerScoresBody.innerHTML = '';
+            
+            // Add rows for each golfer
+            sortedGolfers.forEach(golfer => {
+                const row = document.createElement('tr');
+                
+                // Create cells
+                const nameCell = document.createElement('td');
+                nameCell.textContent = golfer.name;
+                nameCell.classList.add('bold');
+                
+                const scoreCell = document.createElement('td');
+                scoreCell.textContent = formatScore(golfer.score);
+                scoreCell.classList.add('score');
+                if (golfer.score < 0) scoreCell.classList.add('negative');
+                else if (golfer.score > 0) scoreCell.classList.add('positive');
+                else scoreCell.classList.add('even');
+                
+                const positionCell = document.createElement('td');
+                positionCell.textContent = golfer.position;
+                
+                const todayCell = document.createElement('td');
+                todayCell.textContent = formatScore(golfer.today);
+                if (golfer.today < 0) todayCell.classList.add('negative');
+                else if (golfer.today > 0) todayCell.classList.add('positive');
+                
+                const thruCell = document.createElement('td');
+                thruCell.textContent = golfer.thru;
+                thruCell.classList.add('thru-cell');
+                
+                // Add cells to row
+                row.appendChild(nameCell);
+                row.appendChild(scoreCell);
+                row.appendChild(positionCell);
+                row.appendChild(todayCell);
+                row.appendChild(thruCell);
+                
+                // Add row to table
+                elements.playerScoresBody.appendChild(row);
+            });
+            });
+            
+            // Check if we have saved data in localStorage
+            if (localStorage.getItem('mastersPoolData')) {
+                try {
+                    state.poolData = JSON.parse(localStorage.getItem('mastersPoolData'));
+                    elements.fileUploadCard.style.display = 'none';
+                    elements.leaderboardContainer.style.display = 'block';
+                    refreshScores();
+                    setupAutoRefresh();
+                    showSuccess('Loaded saved pool data');
+                } catch (error) {
+                    console.error('Error loading saved data:', error);
+                }
+            }
+        }
+
+        // Handle file upload
+        function handleFileLoad() {
+            const file = elements.fileInput.files[0];
+            if (!file) {
+                showError('Please select an Excel file first.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    
+                    // Create cells
+                const rankCell = document.createElement('td');
+                rankCell.textContent = index + 1;
+                
+                const nameCell = document.createElement('td');
+                nameCell.textContent = team.name;
+                nameCell.classList.add('bold');
+                
+                const playersCell = document.createElement('td');
+                playersCell.innerHTML = team.golfers.map(g => {
+                    const scoreClass = g.score < 0 ? 'negative' : g.score > 0 ? 'positive' : 'even';
+                    return `<div class="player-summary">${g.name} <span class="score ${scoreClass}">${formatScore(g.score)}</span></div>`;
+                }).join('');
+                
+                const scoreCell = document.createElement('td');
+                scoreCell.textContent = formatScore(team.totalScore);
+                scoreCell.classList.add('score');
+                if (team.totalScore < 0) scoreCell.classList.add('negative');
+                else if (team.totalScore > 0) scoreCell.classList.add('positive');
+                else scoreCell.classList.add('even');
+                
+                // Add cells to row
+                row.appendChild(rankCell);
+                row.appendChild(nameCell);
+                row.appendChild(playersCell);
+                row.appendChild(scoreCell);
+                
+                // Add row to table
+                elements.leaderboardBody.appendChild(row); Process the Excel file
+                    processExcelData(workbook);
+                    
+                    // Save the pool data to localStorage
+                    localStorage.setItem('mastersPoolData', JSON.stringify(state.poolData));
+                    
+                    // Hide file upload, show leaderboard
+                    elements.fileUploadCard.style.display = 'none';
+                    elements.leaderboardContainer.style.display = 'block';
+                    
+                    // Load the scores for the first time
+                    refreshScores();
+                    
+                    // Set up auto-refresh
+                    setupAutoRefresh();
+                    
+                    // Show success message
+                    showSuccess('Pool data successfully loaded!');
+                } catch (error) {
+                    console.error('Error processing Excel file:', error);
+                    showError('Error processing the Excel file. Please make sure it follows the expected format.');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        // Load sample data for demonstration
+        function loadSampleData() {
+            // Create sample pool data structure
+            const sampleTeams = [
+                {
+                    name: "Tiger's Fans",
+                    golfers: ["Tiger Woods", "Scottie Scheffler", "Rory McIlroy", "Jordan Spieth"]
+                },
+                {
+                    name: "Birdie Brigade",
+                    golfers: ["Brooks Koepka", "Jon Rahm", "Collin Morikawa", "Justin Thomas"]
+                },
+                {
+                    name: "Green Jacket Club",
+                    golfers: ["Dustin Johnson", "Patrick Cantlay", "Xander Schauffele", "Tommy Fleetwood"]
+                },
+                {
+                    name: "Augusta Eagles",
+                    golfers: ["Bryson DeChambeau", "Viktor Hovland", "Hideki Matsuyama", "Shane Lowry"]
+                },
+                {
+                    name: "Masters Legends",
+                    golfers: ["Phil Mickelson", "Tony Finau", "Cameron Smith", "Adam Scott"]
+                }
+            ];
+            
+            state.poolData = {
+                teams: sampleTeams.map(team => ({
+                    name: team.name,
+                    golfers: team.golfers.map(name => ({
+                        name,
+                        score: null,
+                        position: null,
+                        today: null,
+                        thru: null
+                    })),
+                    totalScore: null
+                })),
+                golferNames: [...new Set(sampleTeams.flatMap(team => team.golfers))]
+            };
+            
+            // Save sample data to localStorage
+            localStorage.setItem('mastersPoolData', JSON.stringify(state.poolData));
+            
+            // Hide file upload, show leaderboard
+            elements.fileUploadCard.style.display = 'none';
+            elements.leaderboardContainer.style.display = 'block';
+            
+            // Load the scores for the first time
+            refreshScores();
+            
+            // Set up auto-refresh
+            setupAutoRefresh();
+            
+            // Show success message
+            showSuccess('Sample data loaded successfully!');
+        }
+
+        // Process the Excel data to extract teams and their golfers
+        function processExcelData(workbook) {
+            // Assume the first sheet contains the data
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const data = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+            
+            // Filter out empty rows
+            const filteredData = data.filter(row => row.length > 0 && row[0]);
+            
+            // Assume first row is headers
+            const headers = filteredData[0];
+            
+            // Process each team (row)
+            const teams = [];
+            for (let i = 1; i < filteredData.length; i++) {
+                const row = filteredData[i];
+                const teamName = row[0];
+                
+                // Each column after team name should be a golfer
+                const golfers = [];
+                for (let j = 1; j < headers.length; j++) {
+                    if (row[j]) {
+                        const golferName = normalizeGolferName(row[j]);
+                        if (golferName) {
+                            golfers.push({
+                                name: golferName,
+                                score: null,
+                                position: null,
+                                today: null,
+                                thru: null
+                            });
+                        }
+                    }
+                }
+                
+                teams.push({
+                    name: teamName,
+                    golfers: golfers,
+                    totalScore: null
+                });
+            }
+            
+            state.poolData = {
+                teams: teams,
+                golferNames: teams.flatMap(team => team.golfers.map(g => g.name))
+                    .filter((name, index, self) => self.indexOf(name) === index) // Unique golfers
+            };
+            
+            console.log('Processed pool data:', state.poolData);
+        }
+
+        // Helper function to normalize golfer names for better matching
+        function normalizeGolferName(name) {
+            if (!name) return '';
+            
+            // Standardize common name formats
+            let normalizedName = name.trim();
+            
+            // Remove any suffixes like "Jr." or "III"
+            normalizedName = normalizedName.replace(/\s+(Jr\.|Sr\.|II|III|IV|V)$/, '');
+            
+            // Standardize names that might be written differently
+            const nameMap = {
+                'Tiger': 'Tiger Woods',
+                'Phil': 'Phil Mickelson',
+                'DJ': 'Dustin Johnson',
+                'Rory': 'Rory McIlroy',
+                'JT': 'Justin Thomas',
+                'Xander': 'Xander Schauffele',
+                'Scottie': 'Scottie Scheffler',
+                'Collin': 'Collin Morikawa',
+                'Bryson': 'Bryson DeChambeau',
+                'Brooks': 'Brooks Koepka',
+                'Jon': 'Jon Rahm'
+                // Add more mappings as needed
+            };
+            
+            return nameMap[normalizedName] || normalizedName;
+        }
+
+        // Fetch live scores (simulated in this version)
+        async function fetchLiveScores() {
+            updateStatus('Fetching latest scores...');
+            
+            try {
+                // In a production app, this would fetch real data from an API
+                // Here we're just generating simulated data
+                const mockScores = await getSimulatedScores();
+                
+                // Update the status and last refresh time
+                state.lastRefresh = new Date();
+                updateStatus(`Scores last updated at ${state.lastRefresh.toLocaleTimeString()}`);
+                elements.lastUpdate.textContent = `Last updated: ${state.lastRefresh.toLocaleString()}`;
+                
+                return mockScores;
+            } catch (error) {
+                console.error('Error fetching scores:', error);
+                updateStatus('Error fetching scores. Please try again.');
+                return null;
+            }
+        }
+
+        // Generate simulated golf scores
+        async function getSimulatedScores() {
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            // Generate mock data for our specific golfers
+            return (state.poolData?.golferNames || []).map(name => {
+                // Find if we already have data for this golfer
+                const existing = state.golfersData.find(g => g.name === name);
+                
+                // Generate new score with slight variation if it exists, or random if not
+                const baseScore = existing ? existing.score : Math.floor(Math.random() * 15) - 10;
+                const scoreChange = Math.random() > 0.7 ? Math.floor(Math.random() * 3) - 1 : 0;
+                const newScore = baseScore + scoreChange;
+                
+                // Random position based on score
+                const position = getPositionFromScore(newScore);
+                
+                // Random today score
+                const today = Math.floor(Math.random() * 7) - 3;
+                
+                // Random hole progress
+                const thru = Math.floor(Math.random() * 19);
+                
+                return {
+                    name,
+                    score: newScore,
+                    position,
+                    today,
+                    thru: thru === 18 ? 'F' : thru.toString()
+                };
+            });
+        }
+
+        // Helper function to get position string from score
+        function getPositionFromScore(score) {
+            if (score < 0) return `T${Math.floor(Math.random() * 5) + 1}`; // Random position 1-5 for under par
+            if (score === 0) return `T${Math.floor(Math.random() * 10) + 5}`; // Random position 5-15 for even
+            return `T${Math.floor(Math.random() * 15) + score + 10}`; // Higher positions for over par
+        }
+
+        // Refresh the scores and update the leaderboard
+        async function refreshScores() {
+            // Disable refresh button during refresh
+            elements.refreshBtn.disabled = true;
+            
+            // Fetch the latest scores
+            const scores = await fetchLiveScores();
+            
+            if (scores) {
+                // Update our stored golfer data
+                state.golfersData = scores;
+                
+                // Update each team's golfers with the latest scores
+                if (state.poolData && state.poolData.teams) {
+                    state.poolData.teams.forEach(team => {
+                        team.golfers.forEach(golfer => {
+                            const scoreData = scores.find(s => s.name === golfer.name);
+                            if (scoreData) {
+                                golfer.score = scoreData.score;
+                                golfer.position = scoreData.position;
+                                golfer.today = scoreData.today;
+                                golfer.thru = scoreData.thru;
+                            }
+                        });
+                        
+                        // Calculate team total score
+                        team.totalScore = team.golfers.reduce((sum, golfer) => {
+                            return sum + (golfer.score !== null ? golfer.score : 0);
+                        }, 0);
+                    });
+                }
+                
+                // Save updated data
+                localStorage.setItem('mastersPoolData', JSON.stringify(state.poolData));
+                
+                // Render both tables
+                renderLeaderboard();
+                renderPlayerScores();
+            }
+            
+            // Re-enable refresh button
+            elements.refreshBtn.disabled = false;
+            
+            // Reset the countdown timer
+            state.countdownSeconds = state.autoRefreshMinutes * 60;
+            updateRefreshTimer();
+        }
+
+        // Set up auto-refresh
+        function setupAutoRefresh() {
+            // Clear any existing interval
+            if (state.refreshInterval) {
+                clearInterval(state.refreshInterval);
+            }
+            
+            // Set the initial countdown
+            state.countdownSeconds = state.autoRefreshMinutes * 60;
+            updateRefreshTimer();
+            
+            // Set up a new interval
+            state.refreshInterval = setInterval(() => {
+                state.countdownSeconds--;
+                updateRefreshTimer();
+                
+                // Auto refresh when countdown reaches zero
+                if (state.countdownSeconds <= 0) {
+                    refreshScores();
+                }
+            }, 1000);
+        }
+
+        // Update the refresh timer display
+        function updateRefreshTimer() {
+            const minutes = Math.floor(state.countdownSeconds / 60);
+            const seconds = state.countdownSeconds % 60;
+            elements.refreshTimer.textContent = `Next refresh in ${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Update the status message
+        function updateStatus(message) {
+            elements.status.textContent = message;
+            elements.status.className = 'status'; // Reset to default styling
+        }
+
+        // Show error message
+        function showError(message) {
+            elements.status.textContent = message;
+            elements.status.className = 'error';
+        }
+
+        // Show success message
+        function showSuccess(message) {
+            elements.status.textContent = message;
+            elements.status.className = 'success';
+        }
+
+        // Render the leaderboard table
+        function renderLeaderboard() {
+            if (!state.poolData || !state.poolData.teams) return;
+            
+            // Sort teams based on the selected sort option
+            const sortedTeams = [...state.poolData.teams].sort((a, b) => {
+                if (elements.sortBy.value === 'totalScore') {
+                    return a.totalScore - b.totalScore;
+                } else {
+                    return a.name.localeCompare(b.name);
+                }
+            });
+            
+            // Clear the table body
+            elements.leaderboardBody.innerHTML = '';
+            
+            // Add rows for each team
+            sortedTeams.forEach((team, index) => {
+                const row = document.createElement('tr');
+                
+                // Add highlight class for top 3
+                if (index === 0) row.classList.add('first', 'top-three');
+                else if (index === 1) row.classList.add('second', 'top-three');
+                else if (index === 2) row.classList.add('third', 'top-three');
+                
+                //
